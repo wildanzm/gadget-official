@@ -1,6 +1,6 @@
 <div>
     {{-- Wrapper utama untuk centering di tengah halaman --}}
-    <div class="flex flex-col min-h-screen items-center justify-center p-4 sm:p-6">
+    <div class="flex flex-col min-h-screen bg-gray-50 items-center justify-center p-4 sm:p-6">
         <form wire:submit.prevent="register"
             class="w-full sm:max-w-md md:w-[500px] bg-white p-6 md:py-[50px] md:px-[30px] flex flex-col gap-5 rounded-xl md:rounded-3xl border border-[#E5E5E5] shadow-md">
 
@@ -13,14 +13,15 @@
             {{-- Name Input --}}
             <div>
                 <div
-                    class="flex items-center gap-3 rounded-full border border-[#E5E5E5] p-3 sm:p-4 focus-within:ring-2 focus-within:ring-[#FFC736] transition-all duration-300">
+                    class="flex items-center gap-3 rounded-full border border-[#E5E5E5] p-3 sm:p-4 focus-within:ring-2 focus-within:ring-[#FFC736] transition-all duration-300 @error('name') border-red-500 ring-red-500 @enderror">
                     <div class="flex shrink-0">
-                        <img src="{{ asset('assets/images/icons/profile-circle.svg') }}" alt="icon"
+                        <img src="{{ asset('assets/images/icons/profile-circle.svg') }}" alt="Ikon Nama Pengguna"
                             class="w-5 h-5 sm:w-6 sm:h-6">
                     </div>
                     <input type="text" wire:model.defer="name"
-                        class="appearance-none outline-none w-full placeholder:text-[#616369] placeholder:font-normal font-semibold text-black text-sm sm:text-base"
-                        placeholder="Masukan Nama Lengkap" autofocus>
+                        class="appearance-none outline-none w-full placeholder:text-[#616369] placeholder:font-normal font-semibold text-black text-sm sm:text-base
+                           bg-transparent border-0 focus:ring-0"
+                        {{-- Ditambahkan: bg-transparent border-0 focus:ring-0 --}} placeholder="Masukan Nama Lengkap" autofocus>
                 </div>
                 @error('name')
                     <span class="text-red-500 text-xs mt-1 ml-4">{{ $message }}</span>
@@ -30,14 +31,15 @@
             {{-- Email Input --}}
             <div>
                 <div
-                    class="flex items-center gap-3 rounded-full border border-[#E5E5E5] p-3 sm:p-4 focus-within:ring-2 focus-within:ring-[#FFC736] transition-all duration-300">
+                    class="flex items-center gap-3 rounded-full border border-[#E5E5E5] p-3 sm:p-4 focus-within:ring-2 focus-within:ring-[#FFC736] transition-all duration-300 @error('email') border-red-500 ring-red-500 @enderror">
                     <div class="flex shrink-0">
-                        <img src="{{ asset('assets/images/icons/sms.svg') }}" alt="icon"
+                        <img src="{{ asset('assets/images/icons/sms.svg') }}" alt="Ikon Email"
                             class="w-5 h-5 sm:w-6 sm:h-6">
                     </div>
                     <input type="email" wire:model.defer="email"
-                        class="appearance-none outline-none w-full placeholder:text-[#616369] placeholder:font-normal font-semibold text-black text-sm sm:text-base"
-                        placeholder="Masukan Email">
+                        class="appearance-none outline-none w-full placeholder:text-[#616369] placeholder:font-normal font-semibold text-black text-sm sm:text-base
+                           bg-transparent border-0 focus:ring-0"
+                        {{-- Ditambahkan: bg-transparent border-0 focus:ring-0 --}} placeholder="Masukan Email">
                 </div>
                 @error('email')
                     <span class="text-red-500 text-xs mt-1 ml-4">{{ $message }}</span>
@@ -47,19 +49,22 @@
             {{-- Password Input --}}
             <div class="flex flex-col gap-1">
                 <div x-data="{ showPassword: false }"
-                    class="flex items-center gap-3 rounded-full border border-[#E5E5E5] p-3 sm:p-4 focus-within:ring-2 focus-within:ring-[#FFC736] transition-all duration-300">
+                    class="flex items-center gap-3 rounded-full border border-[#E5E5E5] p-3 sm:p-4 focus-within:ring-2 focus-within:ring-[#FFC736] transition-all duration-300 @error('password') border-red-500 ring-red-500 @enderror">
                     <div class="flex shrink-0">
-                        <img src="{{ asset('assets/images/icons/lock.svg') }}" alt="icon"
+                        <img src="{{ asset('assets/images/icons/lock.svg') }}" alt="Ikon Kunci Password"
                             class="w-5 h-5 sm:w-6 sm:h-6">
                     </div>
                     <input :type="showPassword ? 'text' : 'password'" wire:model.defer="password"
-                        class="appearance-none outline-none w-full placeholder:text-[#616369] placeholder:font-normal font-semibold text-black text-sm sm:text-base"
-                        placeholder="Masukan Password">
-                    <button type="button" @click="showPassword = !showPassword" class="reveal-password flex shrink-0">
-                        <img x-show="!showPassword" src="{{ asset('assets/images/icons/eye.svg') }}" alt="show"
-                            class="w-5 h-5 sm:w-6 sm:h-6">
-                        <img x-show="showPassword" src="{{ asset('assets/images/icons/eye.svg') }}" alt="hide"
-                            class="w-5 h-5 sm:w-6 sm:h-6" style="display: none;">
+                        class="appearance-none outline-none w-full placeholder:text-[#616369] placeholder:font-normal font-semibold text-black text-sm sm:text-base
+                           bg-transparent border-0 focus:ring-0"
+                        {{-- Ditambahkan: bg-transparent border-0 focus:ring-0 --}} placeholder="Masukan Password">
+                    <button type="button" @click="showPassword = !showPassword" class="reveal-password flex shrink-0"
+                        aria-label="Toggle Password Visibility">
+                        <img x-show="!showPassword" src="{{ asset('assets/images/icons/eye.svg') }}"
+                            alt="Tampilkan password" class="w-5 h-5 sm:w-6 sm:h-6">
+                        <img x-show="showPassword" src="{{ asset('assets/images/icons/eye.svg') }}"
+                            alt="Sembunyikan password" class="w-5 h-5 sm:w-6 sm:h-6"
+                            style="display: none;">
                     </button>
                 </div>
                 @error('password')
@@ -70,25 +75,23 @@
             {{-- Password Confirmation Input --}}
             <div class="flex flex-col gap-1">
                 <div x-data="{ showPassword: false }"
-                    class="flex items-center gap-3 rounded-full border border-[#E5E5E5] p-3 sm:p-4 focus-within:ring-2 focus-within:ring-[#FFC736] transition-all duration-300">
+                    class="flex items-center gap-3 rounded-full border border-[#E5E5E5] p-3 sm:p-4 focus-within:ring-2 focus-within:ring-[#FFC736] transition-all duration-300 @error('password_confirmation') border-red-500 ring-red-500 @enderror">
                     <div class="flex shrink-0">
-                        <img src="{{ asset('assets/images/icons/lock.svg') }}" alt="icon"
+                        <img src="{{ asset('assets/images/icons/lock.svg') }}" alt="Ikon Kunci Konfirmasi Password"
                             class="w-5 h-5 sm:w-6 sm:h-6">
                     </div>
                     <input :type="showPassword ? 'text' : 'password'" wire:model.defer="password_confirmation"
-                        class="appearance-none outline-none w-full placeholder:text-[#616369] placeholder:font-normal font-semibold text-black text-sm sm:text-base"
-                        placeholder="Konfirmasi Password">
-                    <button type="button" @click="showPassword = !showPassword" class="reveal-password flex shrink-0">
-                        <img x-show="!showPassword" src="{{ asset('assets/images/icons/eye.svg') }}" alt="show"
-                            class="w-5 h-5 sm:w-6 sm:h-6">
-                        <img x-show="showPassword" src="{{ asset('assets/images/icons/eye-slash.svg') }}"
-                            alt="hide" class="w-5 h-5 sm:w-6 sm:h-6" style="display: none;">
+                        class="appearance-none outline-none w-full placeholder:text-[#616369] placeholder:font-normal font-semibold text-black text-sm sm:text-base
+                           bg-transparent border-0 focus:ring-0"
+                        {{-- Ditambahkan: bg-transparent border-0 focus:ring-0 --}} placeholder="Konfirmasi Password">
+                    <button type="button" @click="showPassword = !showPassword" class="reveal-password flex shrink-0"
+                        aria-label="Toggle Password Confirmation Visibility">
+                        <img x-show="!showPassword" src="{{ asset('assets/images/icons/eye.svg') }}"
+                            alt="Tampilkan password" class="w-5 h-5 sm:w-6 sm:h-6">
+                        <img x-show="showPassword" src="{{ asset('assets/images/icons/eye.svg') }}"
+                            alt="Sembunyikan password" class="w-5 h-5 sm:w-6 sm:h-6" style="display: none;">
                     </button>
                 </div>
-                {{-- Pesan error untuk password_confirmation biasanya ditangani oleh rule 'confirmed' pada 'password',
-                     Namun, jika Anda ingin pesan spesifik untuk field ini (misalnya jika kosong padahal password diisi),
-                     Anda bisa menambahkan validasi dan pesan terpisah di komponen Livewire.
-                     Untuk saat ini, error 'password.confirmed' akan mencakup ketidakcocokan. --}}
                 @error('password_confirmation')
                     <span class="text-red-500 text-xs mt-1 ml-4">{{ $message }}</span>
                 @enderror

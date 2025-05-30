@@ -71,11 +71,11 @@ class Login extends Component
         if ($user && $user->hasRole('admin')) {
             // Jika user adalah admin, arahkan ke dashboard admin
             // Pastikan Anda memiliki route dengan nama 'admin.dashboard'
-            $defaultRedirectUrl = route('dashboard', absolute: false);
-        } else {
+            $defaultRedirectUrl = route('admin.dashboard', absolute: false);
+        } else if ($user && $user->hasRole('user')) {
             // Jika user adalah pengguna biasa (atau role lain yang bukan admin), arahkan ke halaman home
             // Pastikan Anda memiliki route dengan nama 'home'
-            $defaultRedirectUrl = route('welcome', absolute: false);
+            $defaultRedirectUrl = route('home', absolute: false);
         }
 
         $this->redirectIntended(default: $defaultRedirectUrl, navigate: true);

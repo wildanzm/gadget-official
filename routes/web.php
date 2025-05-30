@@ -1,20 +1,24 @@
 <?php
 
 use App\Livewire\LandingPage;
-use App\Livewire\Settings\Appearance;
-use App\Livewire\Settings\Password;
+use App\Livewire\Admin\Dashboard;
+use App\Livewire\Admin\Product\Create;
 use App\Livewire\Settings\Profile;
+use App\Livewire\Settings\Password;
+use App\Livewire\Admin\Product\Index;
+use App\Livewire\Settings\Appearance;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', LandingPage::class)->name('home');
 
-// Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
-//     Route::view('dashboard', 'dashboard')->name('dashboard');
-// });
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('dashboard', Dashboard::class)->name('dashboard');
 
-Route::view('dashboard', 'dashboard')
-    ->middleware(['auth', 'verified'])
-    ->name('dashboard');
+    // Product Route
+    Route::get('/produk', Index::class)->name('product.index');
+    Route::get('/produk/tambah-produk', Create::class)->name('product.create');
+});
+
 
 Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');

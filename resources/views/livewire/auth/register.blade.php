@@ -1,6 +1,6 @@
 <div>
     {{-- Wrapper utama untuk centering di tengah halaman --}}
-    <div class="flex flex-col min-h-screen bg-gray-50 items-center justify-center p-4 sm:p-6">
+    <div class="flex flex-col min-h-screen items-center justify-center p-4 sm:p-6">
         <form wire:submit.prevent="register"
             class="w-full sm:max-w-md md:w-[500px] bg-white p-6 md:py-[50px] md:px-[30px] flex flex-col gap-5 rounded-xl md:rounded-3xl border border-[#E5E5E5] shadow-md">
 
@@ -63,8 +63,7 @@
                         <img x-show="!showPassword" src="{{ asset('assets/images/icons/eye.svg') }}"
                             alt="Tampilkan password" class="w-5 h-5 sm:w-6 sm:h-6">
                         <img x-show="showPassword" src="{{ asset('assets/images/icons/eye.svg') }}"
-                            alt="Sembunyikan password" class="w-5 h-5 sm:w-6 sm:h-6"
-                            style="display: none;">
+                            alt="Sembunyikan password" class="w-5 h-5 sm:w-6 sm:h-6" style="display: none;">
                     </button>
                 </div>
                 @error('password')

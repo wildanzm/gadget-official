@@ -1,15 +1,19 @@
 <?php
 
+use App\Livewire\Cart;
+use App\Livewire\Admin\Sale;
 use App\Livewire\LandingPage;
 use App\Livewire\Admin\Dashboard;
-use App\Livewire\Admin\Product\Create;
+use App\Livewire\Admin\Order;
 use App\Livewire\Settings\Profile;
 use App\Livewire\Settings\Password;
 use App\Livewire\Admin\Product\Index;
 use App\Livewire\Settings\Appearance;
 use Illuminate\Support\Facades\Route;
+use App\Livewire\Admin\Product\Create;
 
 Route::get('/', LandingPage::class)->name('home');
+Route::get('/keranjang', Cart::class)->name('cart');
 
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('dashboard', Dashboard::class)->name('dashboard');
@@ -17,6 +21,10 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     // Product Route
     Route::get('/produk', Index::class)->name('product.index');
     Route::get('/produk/tambah-produk', Create::class)->name('product.create');
+
+    Route::get('/penjualan', Sale::class)->name('sale');
+    Route::get('/pesanan', Order::class)->name('order');
+    
 });
 
 

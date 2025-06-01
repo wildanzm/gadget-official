@@ -2,11 +2,13 @@
 
 namespace App\Livewire;
 
+use App\Models\Cart;
 use App\Models\Product;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Layout;
+use Illuminate\Support\Facades\Auth;
 
 #[Layout('components.layouts.app')]
 #[Title('Home')]
@@ -24,13 +26,51 @@ class LandingPage extends Component
      */
     public function addToCart($productId)
     {
-        // Logika untuk menambahkan produk ke keranjang
-        // Contoh: Cart::add($productId, ...);
-        // session()->flash('message', 'Produk ditambahkan ke keranjang!');
-        $this->dispatch('productAddedToCart', ['productId' => $productId]); // Emit event
-        // dd('Produk ID ' . $productId . ' ditambahkan ke keranjang.'); // Untuk debugging
-    }
+        if (!Auth::check()) {
+            session()->flash('cart_error', 'Anda harus login terlebih dahulu untuk menambahkan produk ke keranjang.');
+            return;
+        }
 
+        $product = Product::find($productId);
+
+        if (!$product) {
+            session()->flash('cart_error', 'Produk tidak ditemukan.');
+            return;
+        }
+
+        if ($product->stock <= 0) {
+            session()->flash('cart_error', 'Maaf, stok produk ' . $product->name . ' saat ini habis.');
+            return;
+        }
+
+        $userId = Auth::id();
+        $cartItem = Cart::where('user_id', $userId)
+            ->where('product_id', $productId)
+            ->first();
+
+        if ($cartItem) {
+            if ($product->stock > $cartItem->quantity) {
+                $cartItem->increment('quantity');
+                // Pesan sukses ketika kuantitas ditambah
+                session()->flash('cart_message', $product->name . ' berhasil ditambahkan lagi ke keranjang!');
+            } else {
+                session()->flash('cart_error', 'Tidak dapat menambah jumlah ' . $product->name . ', stok tidak mencukupi.');
+                return;
+            }
+        } else {
+            Cart::create([
+                'user_id' => $userId,
+                'product_id' => $productId,
+                'quantity' => 1,
+            ]);
+            // Pesan sukses ketika produk baru ditambahkan
+            session()->flash('cart_message', $product->name . ' berhasil ditambahkan ke keranjang!');
+        }
+
+        // Kirim event untuk update jumlah item di keranjang (di header, dll.)
+        $this->dispatch('cartUpdated');
+    }
+    
     public function render()
     {
         // Ambil produk dari database. Contoh: 10 produk terbaru dengan paginasi.

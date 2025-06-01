@@ -91,8 +91,22 @@
                 </a>
             </div>
 
+            @if (session()->has('cart_message'))
+                <div class="mb-4 p-3 text-sm text-green-700 bg-green-100 rounded-lg" x-data="{ show: true }"
+                    x-show="show" x-init="setTimeout(() => show = false, 3000)" x-transition:leave="transition ease-in duration-300"
+                    x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
+                    {{ session('cart_message') }}
+                </div>
+            @endif
+
+            @if (session()->has('cart_error'))
+                <div class="mb-4 p-3 text-sm text-red-700 bg-red-100 rounded-lg" x-data="{ show: true }" x-show="show"
+                    x-init="setTimeout(() => show = false, 3000)" x-transition:leave="transition ease-in duration-300"
+                    x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
+                    {{ session('cart_error') }}
+                </div>
+            @endif
             {{-- Grid Produk Responsif --}}
-            {{-- Ini adalah bagian dari view komponen Livewire, misalnya resources/views/livewire/product/product-grid.blade.php --}}
             <div
                 class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 xs:gap-4 sm:gap-6 md:gap-[30px]">
 
@@ -101,8 +115,7 @@
                         <div
                             class="bg-white flex flex-col gap-3 sm:gap-4 p-3 sm:p-4 md:p-5 rounded-[20px] ring-1 ring-[#E5E5E5] group-hover:ring-2 group-hover:ring-[#FFC736] transition-all duration-300 w-full h-full shadow hover:shadow-xl">
                             {{-- Link ke detail produk menggunakan slug produk --}}
-                            <a href="" {{-- Ganti 'product.show' dengan nama route Anda --}}
-                                class="block">
+                            <a href="" {{-- Ganti 'product.show' dengan nama route Anda --}} class="block">
                                 <div
                                     class="w-full h-[120px] xs:h-[140px] sm:h-[160px] flex shrink-0 items-center justify-center overflow-hidden rounded-lg mb-2 sm:mb-0">
                                     @if ($product->image)
@@ -127,8 +140,7 @@
                             <div class="flex flex-col gap-1 sm:gap-2 flex-grow">
                                 <div class="flex flex-col gap-0.5 sm:gap-1">
                                     {{-- Link ke detail produk menggunakan slug produk --}}
-                                    <a href=""
-                                        class="hover:underline">
+                                    <a href="" class="hover:underline">
                                         <h3 class="font-semibold text-black leading-tight sm:leading-[22px] text-sm sm:text-base truncate"
                                             title="{{ $product->name }}">
                                             {{ $product->name }}
@@ -146,8 +158,8 @@
                             {{-- Tombol Tambah ke Keranjang --}}
                             <button type="button" wire:click="addToCart({{ $product->id }})"
                                 class="w-full mt-2 sm:mt-3 py-2 px-3 sm:py-2.5 sm:px-4 bg-[#0D5CD7] text-white text-xs sm:text-sm font-semibold rounded-full
-                           hover:bg-blue-800 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50
-                           disabled:opacity-70 whitespace-nowrap text-center">
+                                       hover:bg-blue-800 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50
+                                       disabled:opacity-70 whitespace-nowrap text-center">
                                 Masuk Keranjang
                             </button>
                         </div>

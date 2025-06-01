@@ -21,7 +21,7 @@
                 {{-- Nama Produk --}}
                 <div>
                     <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nama
-                        Produk <span class="text-red-500">*</span></label>
+                        Produk</label>
                     <input type="text" id="name" wire:model.live.debounce.300ms="name" {{-- wire:model.live agar slug terupdate real-time --}}
                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                         placeholder="Masukkan nama produk">
@@ -33,8 +33,7 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     {{-- Harga Produk --}}
                     <div>
-                        <label for="price" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Harga
-                            <span class="text-red-500">*</span></label>
+                        <label for="price" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Harga</label>
                         <input type="number" id="price" wire:model.lazy="price" step="any"
                             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                             placeholder="Contoh: 1500000">
@@ -45,8 +44,7 @@
 
                     {{-- Stok Produk --}}
                     <div>
-                        <label for="stock" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Stok
-                            <span class="text-red-500">*</span></label>
+                        <label for="stock" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Stok</label>
                         <input type="number" id="stock" wire:model.lazy="stock"
                             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                             placeholder="Contoh: 100">

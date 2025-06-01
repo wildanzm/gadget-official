@@ -30,7 +30,7 @@
 
             {{-- Menu Desktop --}}
             <ul class="hidden md:flex items-center gap-5 lg:gap-[30px] text-sm lg:text-base">
-                <li class="hover:font-bold hover:text-[#FFC736] transition-all duration-300 font-bold text-[#FFC736]">
+                <li class="hover:font-bold hover:text-[#FFC736] transition-all duration-300 text-white">
                     <a href="">Home</a> {{-- Ganti dengan nama route yang sesuai --}}
                 </li>
                 <li class="hover:font-bold hover:text-[#FFC736] transition-all duration-300 text-white">
@@ -46,11 +46,7 @@
 
             {{-- Tombol Aksi Desktop --}}
             <div class="hidden md:flex items-center gap-2 lg:gap-3">
-                <a href="" class="p-2 text-white hover:text-[#FFC736] transition-colors">
-                    <div class="w-10 h-10 sm:w-8 sm:h-8 flex shrink-0">
-                        <img src="{{ asset('assets/images/icons/cart.svg') }}" alt="Shopping Cart">
-                    </div>
-                </a>
+                <livewire:components.cart-counter />
 
                 {{-- Ganti bagian @auth di dalam "Tombol Aksi Desktop" Anda dengan ini --}}
                 @auth
@@ -213,12 +209,7 @@
             </ul>
 
             <div class="pt-4 border-t border-white/20 space-y-3">
-                <a href=""
-                    class="flex items-center py-2.5 px-3 rounded-md text-base font-medium text-white hover:bg-white/10 transition-colors">
-                    <img src="{{ asset('assets/images/icons/cart.svg') }}" alt="Shopping Cart"
-                        class="w-5 h-5 mr-2 filter invert brightness-0">
-                    <span>Keranjang</span>
-                </a>
+                <livewire:components.cart-counter />
                 @auth {{-- Jika Pengguna Sudah Login (Mobile Logout) --}}
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf

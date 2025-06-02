@@ -17,6 +17,7 @@ return new class extends Migration
             $table->decimal('amount', 15, 2); // Jumlah cicilan per periode
             $table->date('due_date'); // Tanggal jatuh tempo cicilan
             $table->boolean('is_paid')->default(false); // Status pembayaran cicilan
+            $table->timestamp('paid_at')->nullable(); // Status pembayaran cicilan
             $table->timestamps();
         });
     }

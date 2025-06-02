@@ -69,3 +69,17 @@ select:focus[data-flux-control] {
 /* \[:where(&)\]:size-4 {
     @apply size-4;
 } */
+/* Untuk menyembunyikan scrollbar di browser berbasis WebKit (Chrome, Safari, Edge baru, Opera) */
+.hide-scrollbar::-webkit-scrollbar {
+    display: none; /* atau width: 0; height: 0; */
+}
+
+/* Untuk menyembunyikan scrollbar di Firefox */
+.hide-scrollbar {
+    scrollbar-width: none; /* Firefox */
+}
+
+/* Untuk menyembunyikan scrollbar di IE dan Edge lama (kurang relevan sekarang) */
+.hide-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+}

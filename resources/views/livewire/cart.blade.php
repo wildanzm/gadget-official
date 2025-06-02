@@ -2,7 +2,7 @@
     {{-- Judul Halaman --}}
     <div id="title" class="container max-w-[1130px] mx-auto px-4 sm:px-6 lg:px-8 mt-5">
         <div class="flex flex-col gap-5">
-            <h1 class="font-bold text-3xl sm:text-4xl leading-9 text-black">Keranjang Belanja Anda</h1>
+            <h1 class="font-bold text-3xl sm:text-4xl leading-9 text-black">Keranjang Belanja</h1>
         </div>
     </div>
 

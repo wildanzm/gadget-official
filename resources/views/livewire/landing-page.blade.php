@@ -43,7 +43,7 @@
             <div
                 class="w-full max-w-lg mx-auto lg:w-1/2 xl:w-3/5 lg:max-w-none lg:mx-0 h-auto lg:h-[450px] {{-- Tinggi untuk desktop dinaikkan dari 400px ke 450px --}}
             flex items-center justify-center shrink-0 relative mt-8 lg:mt-0 order-1 lg:order-2">
-                <img src="{{ asset('assets/images/thumbnails/iphone15pro-digitalmat-gallery-3-202309-Photoroom 1.png') }}"
+                <img src="{{ asset('assets/images/banners/mba13-m2-digitalmat-gallery-1-202402-Photoroom 2.png') }}"
                     class="max-h-[300px] sm:max-h-[360px] lg:max-h-[450px] object-contain" {{-- Nilai max-h dinaikkan --}}
                     alt="iPhone 15 Pro Terbaru di Gadget Official">
 

@@ -31,7 +31,7 @@
             {{-- Menu Desktop --}}
             <ul class="hidden md:flex items-center gap-5 lg:gap-[30px] text-sm lg:text-base">
                 <li class="hover:font-bold hover:text-[#FFC736] transition-all duration-300 text-white">
-                    <a href="">Home</a> {{-- Ganti dengan nama route yang sesuai --}}
+                    <a href="{{ route('home') }}">Home</a> {{-- Ganti dengan nama route yang sesuai --}}
                 </li>
                 <li class="hover:font-bold hover:text-[#FFC736] transition-all duration-300 text-white">
                     <a href="">Belanja</a> {{-- Ganti dengan nama route yang sesuai --}}
@@ -40,7 +40,7 @@
                     <a href="">Katalog</a> {{-- Ganti dengan nama route yang sesuai --}}
                 </li>
                 <li class="hover:font-bold hover:text-[#FFC736] transition-all duration-300 text-white">
-                    <a href="">Bonus</a> {{-- Ganti dengan nama route yang sesuai --}}
+                    <a href="{{ route('transaction')}}">Transaksi</a> {{-- Ganti dengan nama route yang sesuai --}}
                 </li>
             </ul>
 
@@ -203,8 +203,8 @@
                 <li><a href=""
                         class="block py-2.5 px-3 rounded-md text-base font-medium text-white hover:bg-white/10 transition-colors">Katalog</a>
                 </li>
-                <li><a href=""
-                        class="block py-2.5 px-3 rounded-md text-base font-medium text-white hover:bg-white/10 transition-colors">Bonus</a>
+                <li><a href="{{ route('transaction') }}"
+                        class="block py-2.5 px-3 rounded-md text-base font-medium text-white hover:bg-white/10 transition-colors">Transaksi</a>
                 </li>
             </ul>
 

@@ -247,7 +247,8 @@ class Cart extends Component
 
 
         // Pastikan route 'order.success' sudah ada dan menerima parameter
-        return session()->flash('orderSuccess', 'Pesanan Anda berhasil dibuat! Kode Pesanan: ' . $finalOrderCode);
+        session()->flash('orderSuccess', 'Pesanan Anda berhasil dibuat! Kode Pesanan: ' . $finalOrderCode);
+        return redirect()->route('transaction');
     }
 
     public function render()

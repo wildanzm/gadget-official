@@ -19,7 +19,7 @@
                 </svg>
             </div>
             <input wire:model.live.debounce.300ms="search" type="text" id="table-search"
-                class="block w-full p-2.5 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-neutral-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                class="block w-full p-2.5 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 placeholder="Cari Produk...">
         </div>
 
@@ -36,9 +36,9 @@
     </div>
 
     {{-- Kontainer Tabel --}}
-    <div class="relative overflow-x-auto shadow-md sm:rounded-lg border dark:border-neutral-700">
-        <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-neutral-300">
-            <thead class="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-700 dark:text-neutral-400">
+    <div class="relative overflow-x-auto shadow-md sm:rounded-lg border dark:border-gray-700">
+        <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-300">
+            <thead class="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-700 dark:text-gray-400">
                 <tr>
                     <th scope="col" class="px-6 py-3 w-16">No</th>
                     <th scope="col" class="px-6 py-3">Nama Produk</th>
@@ -51,8 +51,7 @@
             </thead>
             <tbody>
                 @forelse ($products as $index => $product)
-                    <tr
-                        class="bg-white border-b dark:bg-gray-800 dark:border-neutral-700">
+                    <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
                         <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">
                             {{ $products->firstItem() + $index }}
                         </td>
@@ -104,8 +103,8 @@
                         </td>
                     </tr>
                 @empty
-                    <tr class="bg-white border-b dark:bg-gray-800 dark:border-neutral-700">
-                        <td colspan="7" class="px-6 py-4 text-center text-gray-500 dark:text-neutral-400">
+                    <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                        <td colspan="7" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
                             Tidak ada produk ditemukan.
                         </td>
                     </tr>

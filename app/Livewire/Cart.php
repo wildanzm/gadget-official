@@ -27,9 +27,6 @@ class Cart extends Component
     public $installmentPlan = ''; // 3, 6, 12 (bulan)
 
     public $subTotal = 0;
-    // Hapus: public $insuranceFee = 0;
-    // Hapus: public $shippingFee = 25000; // Akan di-nolkan atau tidak digunakan
-    // Hapus: public $ppnAmount = 0;
     public $interestAmount = 0;
     public $grandTotal = 0;
 

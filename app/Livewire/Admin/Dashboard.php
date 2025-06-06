@@ -8,6 +8,7 @@ use App\Models\Product;
 use Livewire\Component;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Layout;
+use Illuminate\Support\Facades\DB;
 
 
 #[Layout('components.layouts.admin')]
@@ -28,21 +29,27 @@ class Dashboard extends Component
         $currentMonth = Carbon::now()->month;
         $currentYear = Carbon::now()->year;
 
-        // 1. Total Penjualan Bulanan
-        // Anda mungkin ingin menambahkan filter status, e.g., ->where('status', 'completed')
-        $this->totalMonthlySales = Order::whereYear('created_at', $currentYear)
-            ->whereMonth('created_at', $currentMonth)
-            // ->whereIn('status', ['completed', 'paid', 'delivered']) // Contoh filter status
-            ->sum('total_amount');
+        // Daftar status pesanan yang dianggap sebagai penjualan yang sah (lunas/selesai)
+        $validSaleStatuses = ['paid', 'processing', 'shipped', 'delivered', 'completed'];
 
-        // 2. Jumlah Produk yang Dimiliki
+        // 1. Total Penjualan Bulanan (DIperbaiki)
+        // Kita akan join tabel orders dan order_items, lalu menjumlahkan (harga * kuantitas)
+        $totalSales = DB::table('orders')
+            ->join('order_items', 'orders.id', '=', 'order_items.order_id')
+            ->whereYear('orders.created_at', $currentYear)
+            ->whereMonth('orders.created_at', $currentMonth)
+            ->whereIn('orders.status', $validSaleStatuses)
+            ->sum(DB::raw('order_items.price * order_items.quantity')); // Menjumlahkan hasil perkalian
+
+        $this->totalMonthlySales = $totalSales;
+
+        // 2. Jumlah Total Produk yang Dimiliki (Tetap sama)
         $this->totalProducts = Product::count();
 
-        // 3. Jumlah Transaksi Bulanan
-        // Anda mungkin ingin menambahkan filter status juga di sini
+        // 3. Jumlah Transaksi Bulanan (Tetap sama, tapi pastikan filternya benar)
         $this->totalMonthlyTransactions = Order::whereYear('created_at', $currentYear)
             ->whereMonth('created_at', $currentMonth)
-            // ->whereIn('status', ['completed', 'paid', 'delivered']) // Contoh filter status
+            //->whereIn('status', $validSaleStatuses)
             ->count();
     }
 

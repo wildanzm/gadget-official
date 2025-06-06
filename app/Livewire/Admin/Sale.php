@@ -8,136 +8,158 @@ use Livewire\Component;
 use App\Models\OrderItem;
 use Livewire\WithPagination;
 use Livewire\Attributes\Title;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Livewire\Attributes\Layout;
+use Illuminate\Support\Facades\DB; // Pastikan DB Facade diimpor
+use Illuminate\Support\Str;
 
 #[Layout('components.layouts.admin')]
 #[Title('Penjualan')]
-
 class Sale extends Component
 {
+    // ... (properti dan metode lain tetap sama) ...
     use WithPagination;
 
-    public string $filterPeriod = 'monthly'; // Pilihan: 'daily', 'weekly', 'monthly', 'annual'
-    public $salesData;
+    public int $perPage = 10;
+
+    public string $filterPeriod = 'monthly';
+    public $filterMonth;
+    public $filterYear;
+    public $filterPaymentMethod = '';
+
     public int $totalProductsSold = 0;
     public float $totalSalesRevenue = 0;
 
     public function mount()
     {
-        $this->loadSalesData();
+        if ($this->filterPeriod === 'custom') {
+            $this->filterMonth = Carbon::now()->month;
+            $this->filterYear = Carbon::now()->year;
+        }
+        $this->calculateTotals();
     }
 
-    public function updatedFilterPeriod()
+    public function updated($propertyName)
     {
-        $this->resetPage(); // Reset paginasi saat filter berubah
-        $this->loadSalesData();
+        if ($propertyName === 'filterPeriod' && $this->filterPeriod !== 'custom') {
+            $this->filterMonth = null;
+            $this->filterYear = null;
+        }
+        $this->resetPage();
+        $this->calculateTotals();
     }
 
-    public function loadSalesData()
+    protected function getFilteredQuery()
     {
-        $query = OrderItem::with(['order', 'product'])
-            ->whereHas('order', function ($q_order) {
-                // Filter hanya pesanan yang sudah dianggap selesai/valid untuk penjualan
-                // Sesuaikan status ini dengan alur bisnis Anda
-                // $q_order->whereIn('status', ['completed', 'paid', 'delivered']);
+        $validSaleStatuses = ['completed', 'delivered', 'paid', 'shipped'];
 
-                switch ($this->filterPeriod) {
-                    case 'today':
-                        $q_order->whereDate('created_at', Carbon::today());
-                        break;
-                    case 'weekly':
-                        $q_order->whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()]);
-                        break;
-                    case 'monthly':
-                        $q_order->whereYear('created_at', Carbon::now()->year)
-                            ->whereMonth('created_at', Carbon::now()->month);
-                        break;
-                    case 'annual':
-                        $q_order->whereYear('created_at', Carbon::now()->year);
-                        break;
-                }
+        return OrderItem::with(['order.user', 'product'])
+            ->whereHas('order', function ($q_order) use ($validSaleStatuses) {
+                $q_order->whereIn('status', $validSaleStatuses)
+                    ->when($this->filterPaymentMethod, function ($q_payment, $method) {
+                        $q_payment->where('payment_method', $method);
+                    })
+                    ->when($this->filterPeriod, function ($q_period, $period) {
+                        // Logika untuk periode cepat
+                        match ($period) {
+                            'today' => $q_period->whereDate('created_at', Carbon::today()),
+                            'weekly' => $q_period->whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()]),
+                            'monthly' => $q_period->whereYear('created_at', Carbon::now()->year)->whereMonth('created_at', Carbon::now()->month),
+                            'last_month' => $q_period->whereYear('created_at', Carbon::now()->subMonth()->year)->whereMonth('created_at', Carbon::now()->subMonth()->month),
+                            'annual' => $q_period->whereYear('created_at', Carbon::now()->year),
+                            default => null, // Untuk 'custom' atau 'all', tidak ada filter tanggal di sini
+                        };
+                    })
+                    // Logika untuk filter bulan & tahun spesifik (jika periode 'custom')
+                    ->when($this->filterPeriod === 'custom' && $this->filterYear, function ($q_year, $year) {
+                        $q_year->whereYear('created_at', $this->filterYear);
+                    })
+                    ->when($this->filterPeriod === 'custom' && $this->filterMonth, function ($q_month, $month) {
+                        $q_month->whereMonth('created_at', $this->filterMonth);
+                    });
             });
-
-        $this->salesData = $query->get(); // Jika tidak ingin paginasi untuk summary, atau paginate jika data banyak
-
-        // Untuk paginasi pada tabel, Anda bisa melakukan query lagi dengan paginate:
-        // $this->paginatedSalesData = $query->latest('orders.created_at')->paginate(10);
-        // Namun untuk kemudahan, kita akan paginate hasil $this->salesData di view jika diperlukan,
-        // atau langsung $this->salesData = $query->latest('orders.created_at')->paginate(10);
-        // dan summary dihitung dari semua data periode tersebut (bukan hanya halaman saat ini).
-        // Mari kita hitung summary dari semua data periode yang difilter:
-        $allSalesDataForPeriod = $query->get();
-
-        $this->totalProductsSold = $allSalesDataForPeriod->sum('quantity');
-        $this->totalSalesRevenue = $allSalesDataForPeriod->sum(function ($item) {
-            return $item->price * $item->quantity; // price dari order_items adalah harga saat penjualan
-        });
-
-        // Untuk tampilan tabel dengan paginasi
-        // Jika Anda ingin summary dihitung dari semua data, namun tabel dipaginasi,
-        // Anda perlu dua kueri atau memanipulasi koleksi.
-        // Untuk contoh ini, kita akan memaginasi $this->salesData langsung
-        // Jika Anda menggunakan get() di atas, dan ingin paginasi di view,
-        // Anda perlu implementasi paginasi manual atau gunakan $query->paginate() dan hitung ulang summary.
-        // Cara paling mudah:
-        // $this->salesData = $query->latest('orders.created_at')->paginate(10); // Untuk tabel
-        // Lalu total dihitung dari $query tanpa paginate. Untuk contoh ini, kita sederhanakan:
-        // $this->salesData akan di-loop, dan summary sudah dihitung dari $allSalesDataForPeriod
-
     }
 
-    public function setFilterPeriod(string $period)
+    public function calculateTotals()
     {
-        $this->filterPeriod = $period;
-        $this->updatedFilterPeriod(); // Memanggil method untuk me-load ulang dan mereset paginasi
+        $allSalesForTotals = $this->getFilteredQuery()->get();
+        $this->totalProductsSold = $allSalesForTotals->sum('quantity');
+        $this->totalSalesRevenue = $allSalesForTotals->sum(function ($item) {
+            return $item->price * $item->quantity;
+        });
     }
 
+    /**
+     * Mengarahkan ke route ekspor PDF dengan membawa filter aktif.
+     */
     public function exportPdf()
     {
-        // Logika untuk ekspor PDF akan ada di sini.
-        // Anda memerlukan library seperti DomPDF atau Snappy.
-        // Contoh: return (new SalesReportPdf($this->salesData, $this->totalProductsSold, $this->totalSalesRevenue))->download('laporan-penjualan.pdf');
-        session()->flash('info', 'Fitur Ekspor PDF sedang dalam pengembangan.');
+        // Membuat query string dari filter yang aktif
+        $queryParams = http_build_query([
+            'period' => $this->filterPeriod,
+            'month' => $this->filterMonth,
+            'year' => $this->filterYear,
+            'paymentMethod' => $this->filterPaymentMethod,
+        ]);
+
+        $url = route('admin.reports.sales.stream') . '?' . $queryParams;
+
+        // Mengarahkan ke URL baru di tab baru
+        return $this->redirect($url, navigate: false);
+    }
+
+    // Metode getReportTitle() dan getFilenameSuffix() tetap sama seperti sebelumnya
+    public function getReportTitle(): string
+    {
+        $title = 'Laporan Penjualan ';
+
+        if ($this->filterPaymentMethod) {
+            $title .= 'Metode ' . ucfirst($this->filterPaymentMethod) . ' ';
+        }
+
+        if ($this->filterMonth && $this->filterYear) {
+            $title .= 'Bulan ' . Carbon::create()->month($this->filterMonth)->translatedFormat('F') . ' ' . $this->filterYear;
+        } elseif ($this->filterYear) {
+            $title .= 'Tahun ' . $this->filterYear;
+        } elseif ($this->filterMonth) {
+            $title .= 'Setiap Bulan ' . Carbon::create()->month($this->filterMonth)->translatedFormat('F');
+        } else {
+            $title .= 'Keseluruhan';
+        }
+
+        return $title;
+    }
+
+    private function getFilenameSuffix(): string
+    {
+        $parts = [];
+        if ($this->filterPaymentMethod) {
+            $parts[] = $this->filterPaymentMethod;
+        }
+        if ($this->filterMonth) {
+            $parts[] = 'bulan-' . str_pad($this->filterMonth, 2, '0', STR_PAD_LEFT);
+        }
+        if ($this->filterYear) {
+            $parts[] = 'tahun-' . $this->filterYear;
+        }
+
+        if (empty($parts)) {
+            return 'keseluruhan-' . now()->format('Ymd');
+        }
+
+        return implode('-', $parts);
     }
 
     public function render()
     {
-        // Data sudah di-load oleh mount() atau updatedFilterPeriod()
-        // Jika ingin data selalu fresh pada setiap render (misalnya ada polling), panggil loadSalesData() di sini.
-        // Untuk paginasi, kita akan melakukan query lagi dengan paginasi di sini
-
-        $query = OrderItem::with(['order', 'product'])
-            ->whereHas('order', function ($q_order) {
-                // $q_order->whereIn('status', ['completed', 'paid', 'delivered']); // Filter status
-                switch ($this->filterPeriod) {
-                    case 'today':
-                        $q_order->whereDate('created_at', Carbon::today());
-                        break;
-                    case 'weekly':
-                        $q_order->whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()]);
-                        break;
-                    case 'monthly':
-                        $q_order->whereYear('created_at', Carbon::now()->year)
-                            ->whereMonth('created_at', Carbon::now()->month);
-                        break;
-                    case 'annual':
-                        $q_order->whereYear('created_at', Carbon::now()->year);
-                        break;
-                }
-            });
-
-        // Data untuk tabel dengan paginasi
-        $paginatedSalesItems = $query->orderByDesc(
-            Order::select('created_at')
-                ->whereColumn('id', 'order_items.order_id')
-                ->latest()
-                ->limit(1)
-        )->paginate(10); // Sesuaikan jumlah per halaman
-
+        $paginatedSalesItems = $this->getFilteredQuery()
+            ->select('order_items.*')
+            ->join('orders', 'order_items.order_id', '=', 'orders.id')
+            ->orderBy('orders.created_at', 'desc')
+            ->paginate($this->perPage);
 
         return view('livewire.admin.sale', [
-            'salesItems' => $paginatedSalesItems, // Data untuk tabel
-            // totalProductsSold dan totalSalesRevenue sudah jadi public property
+            'salesItems' => $paginatedSalesItems,
         ]);
     }
 }

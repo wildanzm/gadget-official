@@ -37,6 +37,16 @@
                     <option value="fully_paid">Semua Cicilan Lunas</option>
                 </select>
             </div>
+            <button wire:click="exportPdf" type="button"
+                class="w-full sm:w-auto inline-flex items-center justify-center px-5 py-2.5 text-sm font-medium text-center text-white bg-red-600 rounded-lg hover:bg-red-700 focus:ring-4 focus:ring-red-300 dark:bg-red-500 dark:hover:bg-red-700 dark:focus:ring-red-900 disabled:opacity-50 whitespace-nowrap">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                    </path>
+                </svg>
+                Ekspor PDF
+            </button>
         </div>
 
         {{-- Daftar Kartu Transaksi (Pesanan) --}}
@@ -111,7 +121,6 @@
                         </table>
                     </div>
 
-                    {{-- Daftar Tagihan Cicilan untuk Pesanan Ini --}}
                     @if ($order->installments->isNotEmpty())
                         <div class="p-4 sm:p-6">
                             <h4 class="text-md font-semibold text-gray-800 dark:text-white mb-3">Rincian Tagihan
@@ -119,19 +128,41 @@
                             <div class="space-y-3">
                                 @foreach ($order->installments as $installment)
                                     <div wire:key="installment-{{ $installment->id }}"
-                                        class="p-3 rounded-md {{ $installment->is_paid ? 'bg-green-50 dark:bg-green-900/30 border-green-300 dark:border-green-700' : 'bg-red-50 dark:bg-red-900/30 border-red-300 dark:border-red-700' }} border flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                                        class="p-3 rounded-md border flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 
+                                        {{-- Logika warna kartu tagihan --}}
+                                        {{ $installment->is_paid ? 'bg-green-50 dark:bg-green-900/30 border-green-300 dark:border-green-700' : ($installment->late_days > 0 ? 'bg-red-50 dark:bg-red-900/30 border-red-300 dark:border-red-700' : 'bg-gray-50 dark:bg-gray-700/50 border-gray-300 dark:border-gray-600') }}">
+
                                         <div>
+                                            {{-- Warna teks judul tagihan disesuaikan --}}
                                             <p
-                                                class="text-sm font-medium {{ $installment->is_paid ? 'text-green-700 dark:text-green-300' : 'text-red-800 dark:text-red-300' }}">
+                                                class="text-sm font-medium {{ $installment->is_paid ? 'text-green-700 dark:text-green-300' : ($installment->late_days > 0 ? 'text-red-800 dark:text-red-300' : 'text-gray-800 dark:text-gray-200') }}">
                                                 Cicilan ke-{{ $loop->iteration }} : Rp
                                                 {{ number_format($installment->amount, 0, ',', '.') }}
                                             </p>
                                             <p class="text-xs text-gray-500 dark:text-gray-400">
                                                 Jatuh Tempo:
-                                                {{ $installment->due_date->format('d M Y') }}
+                                                {{ \Carbon\Carbon::parse($installment->due_date)->format('d M Y') }}
                                             </p>
+
+                                            {{-- Menampilkan informasi denda jika ada --}}
+                                            @if ($installment->late_days > 0 && !$installment->is_paid)
+                                                <div class="mt-2 p-2 bg-red-100 dark:bg-red-800/40 rounded-md">
+                                                    <p class="text-xs font-semibold text-red-700 dark:text-red-300">
+                                                        Terlambat {{ $installment->late_days }} hari!
+                                                    </p>
+                                                    <p class="text-xs text-red-600 dark:text-red-400">
+                                                        Denda Keterlambatan: <strong>Rp
+                                                            {{ number_format($installment->late_fee, 0, ',', '.') }}</strong>
+                                                    </p>
+                                                    <p class="text-xs text-gray-600 dark:text-gray-300 mt-1">
+                                                        Total Tagihan + Denda: <strong>Rp
+                                                            {{ number_format($installment->amount + $installment->late_fee, 0, ',', '.') }}</strong>
+                                                    </p>
+                                                </div>
+                                            @endif
                                         </div>
-                                        <div>
+
+                                        <div class="self-center mt-2 sm:mt-0">
                                             @if ($installment->is_paid)
                                                 <span
                                                     class="px-3 py-1 text-xs font-bold text-white bg-green-500 rounded-full">LUNAS</span>
@@ -148,13 +179,15 @@
                         </div>
                     @endif
 
+                    {{-- Footer Kartu --}}
                     <div
                         class="p-4 sm:p-6 bg-gray-50 dark:bg-gray-700/50 border-t border-gray-200 dark:border-gray-700 text-right">
                         <span class="text-sm text-gray-600 dark:text-gray-400">Total Keseluruhan Pesanan: </span>
                         <span class="font-bold text-lg text-blue-600 dark:text-blue-400">Rp
                             {{ number_format($order->total_amount, 0, ',', '.') }}</span>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">(Belum termasuk denda keterlambatan)
+                        </p>
                     </div>
-
                 </div>
             @empty
                 <div

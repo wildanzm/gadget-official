@@ -251,10 +251,9 @@
                         @endif
 
                         <div class="flex flex-col gap-3 mt-6">
-                            <button wire:click="placeOrder" wire:loading.attr="disabled"
-                                class="w-full p-3 sm:p-[12px_24px] bg-[#0D5CD7] rounded-full text-center font-semibold text-white text-base hover:bg-blue-700 transition-colors disabled:opacity-70">
-                                <span wire:loading.remove wire:target="placeOrder">Checkout Sekarang</span>
-                                <span wire:loading wire:target="placeOrder">Memproses...</span>
+                            <button wire:click="placeOrder"
+                                class="w-full p-3 sm:p-[12px_24px] bg-[#0D5CD7] rounded-full text-center font-semibold text-white text-base hover:bg-blue-700 transition-colors">
+                                <span wire:target="placeOrder">Checkout Sekarang</span>
                             </button>
                         </div>
                     </div>

@@ -70,8 +70,8 @@
                             </div>
                             <div>
                                 <p class="text-sm text-gray-500 dark:text-gray-400">Tanggal Pembelian</p>
-                                <p class="font-medium text-gray-800 dark:text-white">
-                                    {{ $order->created_at->format('d M Y, H:i') }}</p>
+                                <p class="font-medium text-gray-800 text-left lg:text-center dark:text-white">
+                                    {{ $order->created_at->locale('id')->translatedFormat('d F Y') }}</p>
                             </div>
                             <div>
                                 <p class="text-sm text-gray-500 dark:text-gray-400">Metode Pembayaran</p>
@@ -185,8 +185,6 @@
                         <span class="text-sm text-gray-600 dark:text-gray-400">Total Keseluruhan Pesanan: </span>
                         <span class="font-bold text-lg text-blue-600 dark:text-blue-400">Rp
                             {{ number_format($order->total_amount, 0, ',', '.') }}</span>
-                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">(Belum termasuk denda keterlambatan)
-                        </p>
                     </div>
                 </div>
             @empty

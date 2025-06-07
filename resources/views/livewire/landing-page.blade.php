@@ -85,10 +85,6 @@
             <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
                 <h2 class="font-bold text-black text-xl sm:text-2xl leading-tight sm:leading-[34px]">Produk Terbaru dari
                     Gadget Official</h2>
-                <a href="{{-- route('catalog.all') --}}" {{-- Ganti dengan route yang benar --}}
-                    class="p-2 px-4 sm:p-[12px_24px] text-black border border-[#E5E5E5] rounded-full font-semibold text-sm sm:text-base hover:bg-gray-50 transition-colors shrink-0">
-                    Lihat Semua
-                </a>
             </div>
 
             @if (session()->has('cart_message'))

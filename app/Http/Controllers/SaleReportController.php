@@ -85,7 +85,7 @@ class SaleReportController extends Controller
             'reportPeriodInfo' => $this->getReportPeriodInfo($filterPeriod, $filterMonth, $filterYear, $filterPaymentMethod)
         ];
 
-        $pdf = Pdf::loadView('pdf.sales-report', $dataForPdf);
+        $pdf = Pdf::loadView('pdf.sales-report', $dataForPdf)->setPaper('a4', 'landscape');
         $filename = 'laporan-penjualan-' . $this->getFilenameSuffix($filterPeriod, $filterMonth, $filterYear, $filterPaymentMethod) . '.pdf';
 
         return $pdf->stream($filename);

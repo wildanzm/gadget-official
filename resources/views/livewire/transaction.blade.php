@@ -173,13 +173,6 @@
                                 </button>
                             @endif
 
-                            {{-- Tombol Cetak Resi Retur muncul jika status 'awaiting_return' (setelah disetujui admin) --}}
-                            @if ($currentStatus == 'awaiting_return')
-                                <button wire:click="printReturnLabel({{ $order->id }})" type="button"
-                                    class="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-center text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 focus:ring-4 focus:ring-gray-300 whitespace-nowrap">
-                                    Cetak Resi Retur
-                                </button>
-                            @endif
                         </div>
                     </div>
                 </div>

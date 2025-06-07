@@ -150,7 +150,7 @@
                                 @endif
                             </td>
                             <td class="px-4 py-4 sm:px-6 text-center text-gray-900 dark:text-white whitespace-nowrap">
-                                {{ $item->order->created_at->format('d M Y') }}
+                                {{ $item->order->created_at->locale('id')->translatedFormat('d F Y') }}
                             </td>
 
                             {{-- Kolom Aksi yang Diperbarui untuk Admin --}}

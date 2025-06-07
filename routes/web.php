@@ -1,9 +1,9 @@
 <?php
 
-use App\Http\Controllers\CreditController;
 use App\Livewire\Cart;
 use App\Livewire\Admin\Sale;
 use App\Livewire\Admin\Order;
+use App\Livewire\Admin\Retur;
 use App\Livewire\Installment;
 use App\Livewire\LandingPage;
 use App\Livewire\Transaction;
@@ -15,6 +15,8 @@ use App\Livewire\Admin\Product\Index;
 use App\Livewire\Settings\Appearance;
 use Illuminate\Support\Facades\Route;
 use App\Livewire\Admin\Product\Create;
+use App\Http\Controllers\ReturController;
+use App\Http\Controllers\CreditController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\SaleReportController;
 
@@ -35,11 +37,14 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/penjualan', Sale::class)->name('sale');
     Route::get('/pesanan', Order::class)->name('order');
     Route::get('/tagihan', Credit::class)->name('credit');
+    Route::get('/retur', Retur::class)->name('retur');
 
     Route::get('penjualan/stream', [SaleReportController::class, 'streamSalesReport'])
         ->name('reports.sales.stream');
     Route::get('tagihan/stream', [CreditController::class, 'streamCreditReport'])
         ->name('credit.stream');
+    Route::get('retur/stream', [ReturController::class, 'streamRetur'])
+        ->name('retur.stream');
 });
 
 

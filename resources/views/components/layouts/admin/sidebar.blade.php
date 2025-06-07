@@ -95,7 +95,25 @@
                     </a>
                 </li>
                 <li>
-                    <a href="{{ route('admin.credit') }}" class="flex items-center p-2 rounded-lg group {{ request()->routeIs('admin.credit') || request()->routeIs('admin.credit')
+                    <a href="{{ route('admin.retur') }}"
+                        class="flex items-center p-2 rounded-lg group {{ request()->routeIs('admin.retur') || request()->routeIs('admin.retur')
+                            ? 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white'
+                            : 'text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700' }}">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                            class="shrink-0 w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white">
+                            <path fill-rule="evenodd"
+                                d="M12 1.5c-1.921 0-3.816.111-5.68.327-1.497.174-2.57 1.46-2.57 2.93V21.75a.75.75 0 0 0 1.029.696l3.471-1.388 3.472 1.388a.75.75 0 0 0 .556 0l3.472-1.388 3.471 1.388a.75.75 0 0 0 1.029-.696V4.757c0-1.47-1.073-2.756-2.57-2.93A49.255 49.255 0 0 0 12 1.5Zm-.97 6.53a.75.75 0 1 0-1.06-1.06L7.72 9.22a.75.75 0 0 0 0 1.06l2.25 2.25a.75.75 0 1 0 1.06-1.06l-.97-.97h3.065a1.875 1.875 0 0 1 0 3.75H12a.75.75 0 0 0 0 1.5h1.125a3.375 3.375 0 1 0 0-6.75h-3.064l.97-.97Z"
+                                clip-rule="evenodd" />
+                        </svg>
+
+
+
+                        <span class="flex-1 ms-3 whitespace-nowrap">Retur</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('admin.credit') }}"
+                        class="flex items-center p-2 rounded-lg group {{ request()->routeIs('admin.credit') || request()->routeIs('admin.credit')
                             ? 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white'
                             : 'text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700' }}">
                         <svg class="shrink-0 w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
@@ -155,7 +173,8 @@
                         </button>
 
                         {{-- Panel Dropdown (Membuka ke atas karena berada di bawah) --}}
-                        <div x-show="open" @click.away="open = false" x-transition:enter="transition ease-out duration-100"
+                        <div x-show="open" @click.away="open = false"
+                            x-transition:enter="transition ease-out duration-100"
                             x-transition:enter-start="transform opacity-0 scale-95"
                             x-transition:enter-end="transform opacity-100 scale-100"
                             x-transition:leave="transition ease-in duration-75"

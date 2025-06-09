@@ -15,19 +15,14 @@ use Faker\Factory as Faker;
 
 class TransactionSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        // 1. Ambil SEMUA user dengan role 'user'
         $users = User::role('user')->get();
         if ($users->isEmpty()) {
             $this->command->error('Tidak ada user dengan role "user". Jalankan UserSeeder terlebih dahulu.');
             return;
         }
 
-        // Ambil produk yang sudah ada
         $products = Product::all();
         if ($products->isEmpty()) {
             $this->command->error('Tidak ada produk di database. Jalankan ProductSeeder terlebih dahulu.');
@@ -36,30 +31,28 @@ class TransactionSeeder extends Seeder
 
         $faker = Faker::create('id_ID');
 
-        // Fungsi helper untuk membuat satu pesanan lengkap
-        // Sekarang $user akan dipilih secara acak di dalam loop
-        $createSuccessfulOrder = function (Carbon $date, $users, $products) use ($faker) {
-            DB::transaction(function () use ($date, $users, $products, $faker) {
+        $createSuccessfulOrder = function (Carbon $date, $users, $products, bool $isLate = false) use ($faker) {
+            DB::transaction(function () use ($date, $users, $products, $isLate, $faker) {
 
-                // 2. Pilih satu user secara acak dari koleksi
                 $randomUser = $users->random();
-
                 $todaysOrderCount = Order::whereDate('created_at', $date)->count();
                 $sequenceNumber = str_pad($todaysOrderCount + 1, 3, '0', STR_PAD_LEFT);
                 $orderCode = 'GO-' . $date->format('Ymd') . $sequenceNumber;
 
-                $paymentMethod = $faker->randomElement(['cash', 'installment']);
+                $paymentMethod = $isLate ? 'installment' : $faker->randomElement(['cash', 'installment']);
                 $installmentPlan = null;
                 if ($paymentMethod === 'installment') {
                     $installmentPlan = $faker->randomElement([3, 6, 12]) . ' Bulan';
                 }
 
+                $orderStatus = $isLate ? 'delivered' : 'completed';
+
                 $order = Order::create([
-                    'user_id' => $randomUser->id, // 3. Gunakan ID user yang random
+                    'user_id' => $randomUser->id,
                     'order_code' => $orderCode,
                     'total_amount' => 0,
-                    'status' => 'completed',
-                    'shipping_address' => $randomUser->address ?? $faker->address(), // Gunakan alamat user random
+                    'status' => $orderStatus,
+                    'shipping_address' => $randomUser->address ?? $faker->address(),
                     'payment_method' => $paymentMethod,
                     'installment_plan' => $installmentPlan,
                     'created_at' => $date,
@@ -83,7 +76,7 @@ class TransactionSeeder extends Seeder
                 $interestAmount = ($order->payment_method === 'installment') ? ($subTotal * 0.05) : 0;
                 $grandTotal = $subTotal + $interestAmount;
 
-                if (Schema::hasColumn('orders', 'name_receiver')) { // Cek jika kolom ada
+                if (Schema::hasColumn('orders', 'name_receiver')) {
                     $order->name_receiver = $randomUser->name;
                 }
                 if (Schema::hasColumn('orders', 'sub_total')) {
@@ -98,13 +91,49 @@ class TransactionSeeder extends Seeder
                 if ($order->payment_method === 'installment') {
                     $tenor = (int) $order->installment_plan;
                     $monthlyPayment = $grandTotal / $tenor;
+                    $today = Carbon::now(config('app.timezone', 'UTC'))->startOfDay();
+
                     for ($i = 1; $i <= $tenor; $i++) {
+
+                        $dueDateForThisInstallment = $date->copy()->addMonthsNoOverflow($i)->startOfDay();
+                        $isInstallmentPaid = true;
+                        $lateDays = 0;
+                        $lateFee = 0;
+
+                        if ($isLate) {
+                            // Jika jatuh tempo sudah lewat atau hari ini, tandai sebagai belum lunas
+                            if ($dueDateForThisInstallment->isPast() || $dueDateForThisInstallment->isToday()) {
+                                $isInstallmentPaid = false;
+
+                                // PERBAIKAN: Logika Perhitungan Keterlambatan dan Denda
+                                // Cek apakah hari ini sudah benar-benar melewati tanggal jatuh tempo
+                                if ($today->isAfter($dueDateForThisInstallment)) {
+
+                                    // Hitung selisih hari sebagai nilai absolut (selalu positif)
+                                    $lateDays = $dueDateForThisInstallment->diffInDays($today);
+
+                                    if ($lateDays > 0) {
+                                        // Denda 0.1% per hari
+                                        $dailyFine = $monthlyPayment * 0.001;
+                                        $lateFee = $dailyFine * $lateDays;
+                                    }
+                                }
+                            }
+
+                            // Jika jatuh tempo di masa depan, juga belum lunas tapi tanpa denda
+                            if ($dueDateForThisInstallment->isFuture()) {
+                                $isInstallmentPaid = false;
+                            }
+                        }
+
                         Installment::create([
                             'order_id' => $order->id,
                             'amount' => $monthlyPayment,
-                            'due_date' => $date->copy()->addMonthsNoOverflow($i),
-                            'is_paid' => true,
-                            'paid_at' => $date->copy()->addMonthsNoOverflow($i)->subDays(rand(1, 5)),
+                            'due_date' => $dueDateForThisInstallment,
+                            'is_paid' => $isInstallmentPaid,
+                            'paid_at' => $isInstallmentPaid ? $dueDateForThisInstallment->copy()->subDays(rand(1, 5)) : null,
+                            'late_days' => $lateDays,
+                            'late_fee' => $lateFee,
                         ]);
                     }
                 }
@@ -126,5 +155,12 @@ class TransactionSeeder extends Seeder
             $createSuccessfulOrder($date, $users, $products);
         }
         $this->command->info('Data Mei 2025 selesai dibuat.');
+
+        $this->command->info('Membuat 5 data transaksi cicilan yang terlambat...');
+        for ($i = 0; $i < 5; $i++) {
+            $pastDate = Carbon::now()->subMonths(rand(2, 4))->subDays(rand(1, 20));
+            $createSuccessfulOrder($pastDate, $users, $products, true);
+        }
+        $this->command->info('Data cicilan terlambat selesai dibuat.');
     }
 }

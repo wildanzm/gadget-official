@@ -44,20 +44,32 @@ class Credit extends Component
             $installment = Installment::with('order')->lockForUpdate()->find($installmentId);
 
             if ($installment && !$installment->is_paid) {
-                // Logika denda bisa juga dimasukkan di sini sebelum menyimpan
-                // jika Anda ingin menyimpan jumlah denda yang dibayarkan ke database
+                $lateFee = 0;
+                $lateDays = 0;
+                $dueDate = Carbon::parse($installment->due_date)->startOfDay();
+                $today = Carbon::now(config('app.timezone', 'UTC'))->startOfDay();
 
+                // Hitung denda jika terlambat
+                if ($today->gt($dueDate)) {
+                    $lateDays = $today->diffInDays($dueDate);
+                    if ($lateDays > 0) {
+                        $lateFee = ($installment->amount * 0.01) * $lateDays; // Denda 1% per hari
+                    }
+                }
+
+                // Simpan semua data pembayaran dan denda ke database
                 $installment->is_paid = true;
                 $installment->paid_at = Carbon::now();
+                $installment->late_days = $lateDays; // Simpan jumlah hari terlambat
+                $installment->late_fee = $lateFee;   // Simpan jumlah denda
                 $installment->save();
 
+                // Cek apakah semua cicilan sudah lunas untuk update status order utama
                 $order = $installment->order;
-                $allInstallmentsPaid = $order->installments()->where('is_paid', false)->doesntExist();
-
-                if ($allInstallmentsPaid) {
-                    $order->status = 'completed'; // Atau 'fully_paid'
+                if ($order->installments()->where('is_paid', false)->doesntExist()) {
+                    $order->status = 'completed';
                     $order->save();
-                    session()->flash('message', 'Semua cicilan untuk pesanan ' . $order->order_code . ' telah lunas. Status pesanan diperbarui.');
+                    session()->flash('message', 'Semua cicilan untuk pesanan ' . $order->order_code . ' telah lunas. Status pesanan diperbarui menjadi Selesai.');
                 } else {
                     session()->flash('message', 'Cicilan untuk pesanan ' . $order->order_code . ' telah ditandai lunas.');
                 }
@@ -69,6 +81,7 @@ class Credit extends Component
 
     public function render()
     {
+        // Logika kueri tidak perlu lagi menghitung denda secara dinamis
         $ordersQuery = Order::with(['user', 'items.product', 'installments'])
             ->where('payment_method', 'installment')
             ->when($this->search, function ($query) {
@@ -79,49 +92,14 @@ class Credit extends Component
             })
             ->when($this->filterStatus, function ($query) {
                 if ($this->filterStatus === 'pending_installments') {
-                    $query->whereHas('installments', function ($q_installment) {
-                        $q_installment->where('is_paid', false);
-                    });
+                    $query->whereHas('installments', fn($q) => $q->where('is_paid', false));
                 } elseif ($this->filterStatus === 'fully_paid') {
-                    $query->whereDoesntHave('installments', function ($q_installment) {
-                        $q_installment->where('is_paid', false);
-                    })->whereHas('installments');
+                    $query->whereDoesntHave('installments', fn($q) => $q->where('is_paid', false))->whereHas('installments');
                 }
             })
             ->orderBy('created_at', 'desc');
 
         $orders = $ordersQuery->paginate($this->perPage);
-
-        // Menambahkan properti denda pada setiap item cicilan untuk ditampilkan di view
-        $orders->getCollection()->transform(function ($order) {
-            if ($order->installments) {
-                $order->installments->transform(function ($installment) {
-                    $installment->late_fee = 0;
-                    $installment->late_days = 0;
-
-                    $dueDate = \Carbon\Carbon::parse($installment->due_date)->startOfDay();
-
-                    // --- MANIPULASI WAKTU UNTUK DEBUGGING ---
-                    // Anggap saja "hari ini" adalah tanggal tertentu untuk tes
-                    // Hapus atau komentari baris ini setelah selesai debugging.
-                    $today = \Carbon\Carbon::createFromDate(2025, 5, 10, 'Asia/Jakarta')->startOfDay();
-                    // Atau gunakan waktu sekarang dengan timezone yang benar
-                    // $today = \Carbon\Carbon::now('Asia/Jakarta')->startOfDay();
-
-                    // Hitung denda jika cicilan BELUM LUNAS dan HARI INI sudah melewati jatuh tempo
-                    if (!$installment->is_paid && $today->gt($dueDate)) {
-                        $lateDays = $today->diffInDays($dueDate);
-                        if ($lateDays > 0) {
-                            $installment->late_days = $lateDays;
-                            // Denda 1% dari jumlah cicilan, dikalikan jumlah hari keterlambatan
-                            $installment->late_fee = ($installment->amount * 0.01) * $lateDays;
-                        }
-                    }
-                    return $installment;
-                });
-            }
-            return $order;
-        });
 
         return view('livewire.admin.credit', [
             'orders' => $orders,

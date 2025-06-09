@@ -15,10 +15,12 @@ use App\Livewire\Admin\Product\Index;
 use App\Livewire\Settings\Appearance;
 use Illuminate\Support\Facades\Route;
 use App\Livewire\Admin\Product\Create;
+use App\Http\Controllers\RecapController;
 use App\Http\Controllers\ReturController;
 use App\Http\Controllers\CreditController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\SaleReportController;
+use App\Livewire\Admin\Recap;
 
 Route::get('/', LandingPage::class)->name('home');
 Route::get('/keranjang', Cart::class)->name('cart');
@@ -38,6 +40,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/pesanan', Order::class)->name('order');
     Route::get('/tagihan', Credit::class)->name('credit');
     Route::get('/retur', Retur::class)->name('retur');
+    Route::get('/rekapitulasi', Recap::class)->name('recap');
 
     Route::get('penjualan/stream', [SaleReportController::class, 'streamSalesReport'])
         ->name('reports.sales.stream');
@@ -45,6 +48,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
         ->name('credit.stream');
     Route::get('retur/stream', [ReturController::class, 'streamRetur'])
         ->name('retur.stream');
+    Route::get('rekapitulasi/stream', [RecapController::class, 'streamRecap'])
+        ->name('recap.stream');
 });
 
 

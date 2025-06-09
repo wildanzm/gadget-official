@@ -103,7 +103,7 @@ class SaleReportController extends Controller
             } elseif ($month) {
                 $text .= 'Setiap Bulan ' . Carbon::create()->month((int)$month)->locale('id')->translatedFormat('F');
             } else {
-                $text .= 'Kustom';
+                $text .= 'Semua Penjualan';
             }
         } else {
             $text .= match ($period) {

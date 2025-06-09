@@ -50,7 +50,7 @@
                 {{-- Dropdown untuk Transaksi --}}
                 <li class="relative" @click.away="transactionDropdownOpen = false" x-cloak>
                     <button @click="transactionDropdownOpen = !transactionDropdownOpen"
-                        class="flex items-center gap-1 transition-all duration-300 {{ request()->routeIs('transaction') || request()->routeIs('user.credit.invoices') ? 'font-bold text-[#FFC736]' : 'text-white hover:text-[#FFC736]' }}">
+                        class="flex items-center gap-1 transition-all duration-300 {{ request()->routeIs('transaction') || request()->routeIs('installment') ? 'font-bold text-[#FFC736]' : 'text-white hover:text-[#FFC736]' }}">
                         <span>Transaksi</span>
                     </button>
                     {{-- Panel Dropdown --}}

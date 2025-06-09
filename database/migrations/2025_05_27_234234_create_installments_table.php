@@ -18,6 +18,8 @@ return new class extends Migration
             $table->date('due_date'); // Tanggal jatuh tempo cicilan
             $table->boolean('is_paid')->default(false); // Status pembayaran cicilan
             $table->timestamp('paid_at')->nullable(); // Status pembayaran cicilan
+            $table->integer('late_days')->default(0);
+            $table->decimal('late_fee', 15, 2)->default(0.00);
             $table->timestamps();
         });
     }

@@ -41,7 +41,6 @@
                             </div>
                         </div>
 
-                        {{-- Garis Pemisah --}}
                         <hr class="my-4 border-gray-200">
 
                         {{-- Rincian Tagihan Cicilan --}}
@@ -50,12 +49,12 @@
                             <div class="space-y-3">
                                 @foreach ($order->installments as $installment)
                                     <div
-                                        class="p-3 rounded-lg border {{ $installment->is_paid ? 'bg-green-50 border-green-200' : ($installment->late_days > 0 ? 'bg-red-50 border-red-200' : 'bg-white border-gray-200') }}">
+                                        class="p-3 rounded-lg border {{ $installment->is_paid ? 'bg-green-50 border-green-200' : (now()->gt($installment->due_date) ? 'bg-red-50 border-red-200' : 'bg-white border-gray-200') }}">
                                         <div
                                             class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                                             <div class="flex-grow">
                                                 <p
-                                                    class="font-medium {{ $installment->is_paid ? 'text-green-800' : ($installment->late_days > 0 ? 'text-red-800' : 'text-gray-800') }}">
+                                                    class="font-medium {{ $installment->is_paid ? 'text-green-800' : (now()->gt($installment->due_date) ? 'text-red-800' : 'text-gray-800') }}">
                                                     Cicilan ke-{{ $loop->iteration }} /
                                                     {{ $order->installments->count() }}: Rp
                                                     {{ number_format($installment->amount, 0, ',', '.') }}
@@ -70,22 +69,29 @@
                                                     <span
                                                         class="px-3 py-1 text-xs font-bold text-white bg-green-500 rounded-full">LUNAS</span>
                                                 @else
+                                                    {{-- Tampilkan badge TERLAMBAT atau BELUM LUNAS --}}
                                                     <span
-                                                        class="px-3 py-1 text-xs font-bold {{ $installment->late_days > 0 ? 'bg-red-500 text-white' : 'bg-yellow-400 text-yellow-900' }} rounded-full">
-                                                        {{ $installment->late_days > 0 ? 'TERLAMBAT' : 'BELUM LUNAS' }}
+                                                        class="px-3 py-1 text-xs font-bold {{ now()->gt($installment->due_date) ? 'bg-red-500 text-white' : 'bg-yellow-400 text-yellow-900' }} rounded-full">
+                                                        {{ now()->gt($installment->due_date) ? 'TERLAMBAT' : 'BELUM LUNAS' }}
                                                     </span>
                                                 @endif
                                             </div>
                                         </div>
+
+                                        {{-- PERBAIKAN: Tampilkan Detail Keterlambatan dan Denda --}}
                                         @if ($installment->late_days > 0 && !$installment->is_paid)
-                                            <div class="mt-2 pt-2 border-t border-red-200">
-                                                <p class="text-xs font-semibold text-red-600">
-                                                    Terlambat {{ $installment->late_days }} hari. Denda: Rp
-                                                    {{ number_format($installment->late_fee, 0, ',', '.') }}
+                                            <div class="mt-3 pt-3 border-t border-red-200/50">
+                                                <p class="text-xs font-semibold text-red-700">
+                                                    <span class="font-bold">Terlambat {{ $installment->late_days }}
+                                                        hari!</span>
                                                 </p>
-                                                <p class="text-xs text-gray-700">
-                                                    Total Pembayaran: Rp
-                                                    {{ number_format($installment->amount + $installment->late_fee, 0, ',', '.') }}
+                                                <p class="text-xs text-red-600">
+                                                    Denda Keterlambatan (0.1%/hari): <strong>Rp
+                                                        {{ number_format($installment->late_fee, 0, ',', '.') }}</strong>
+                                                </p>
+                                                <p class="text-sm font-bold text-gray-800 mt-2">
+                                                    Total yang harus dibayar: <strong class="text-red-600">Rp
+                                                        {{ number_format($installment->amount + $installment->late_fee, 0, ',', '.') }}</strong>
                                                 </p>
                                             </div>
                                         @endif
@@ -112,6 +118,7 @@
         {{-- Paginasi --}}
         @if ($orders->hasPages())
             <div class="mt-8">
+                {{-- PERBAIKAN: Paginasi sudah otomatis menggunakan styling default Tailwind untuk mode terang --}}
                 {{ $orders->links() }}
             </div>
         @endif

@@ -155,6 +155,13 @@ class TransactionSeeder extends Seeder
             $createSuccessfulOrder($date, $users, $products);
         }
         $this->command->info('Data Mei 2025 selesai dibuat.');
+        $this->command->info('Membuat 25 data transaksi untuk Juni 2025...');
+        for ($i = 0; $i < 25; $i++) {
+            $date = Carbon::create(2025, 6, rand(1, 16), rand(8, 22), rand(0, 59), rand(0, 59));
+            // Teruskan koleksi $users ke dalam fungsi
+            $createSuccessfulOrder($date, $users, $products);
+        }
+        $this->command->info('Data Juni 2025 selesai dibuat.');
 
         $this->command->info('Membuat 5 data transaksi cicilan yang terlambat...');
         for ($i = 0; $i < 5; $i++) {

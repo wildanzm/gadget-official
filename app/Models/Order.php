@@ -34,4 +34,9 @@ class Order extends Model
     {
         return $this->hasMany(Installment::class);
     }
+
+    public function getRemainingBalanceAttribute()
+    {
+        return $this->installments->where('is_paid', false)->sum('amount');
+    }
 }

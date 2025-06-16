@@ -59,7 +59,7 @@ class Transaction extends Component
         }
 
         // Status pesanan yang diizinkan untuk mengajukan pengembalian
-        $allowedStatusesForReturn = ['delivered', 'shippedPtr', 'completed'];
+        $allowedStatusesForReturn = ['delivered', 'shipped', 'completed'];
         // Status yang menandakan proses pengembalian sudah berjalan atau selesai
         $returnInProgressStatuses = ['return_requested', 'awaiting_return', 'returned', 'return_rejected'];
 

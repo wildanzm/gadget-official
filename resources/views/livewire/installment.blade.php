@@ -99,6 +99,19 @@
                                 @endforeach
                             </div>
                         </div>
+
+                        {{-- Sisa Tagihan --}}
+                        @if ($order->remaining_balance > 0)
+                            <div class="mt-4 pt-4 border-t border-gray-200">
+                                <div class="flex justify-between items-center">
+                                    <p class="text-sm font-semibold text-gray-800">Sisa Tagihan:</p>
+                                    <p class="text-lg font-bold text-red-600">
+                                        Rp {{ number_format($order->remaining_balance, 0, ',', '.') }}
+                                    </p>
+                                </div>
+                            </div>
+                        @endif
+
                     </div>
                 </div>
             @empty

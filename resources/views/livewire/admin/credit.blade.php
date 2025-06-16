@@ -181,12 +181,26 @@
                     @endif
 
                     {{-- Footer Kartu --}}
+                    {{-- Footer Kartu dengan Total dan Sisa Tagihan --}}
                     <div
-                        class="p-4 sm:p-6 bg-gray-50 dark:bg-gray-700/50 border-t border-gray-200 dark:border-gray-700 text-right">
-                        <span class="text-sm text-gray-600 dark:text-gray-400">Total Keseluruhan Pesanan: </span>
-                        <span class="font-bold text-lg text-blue-600 dark:text-blue-400">Rp
-                            {{ number_format($order->total_amount, 0, ',', '.') }}</span>
+                        class="p-4 sm:p-6 bg-gray-50 dark:bg-gray-700/50 border-t border-gray-200 dark:border-gray-700">
+                        <div class="flex flex-col items-end gap-2">
+                            <div>
+                                <span class="text-sm text-gray-600 dark:text-gray-400">Total Keseluruhan Pesanan:</span>
+                                <span class="font-bold text-lg text-gray-800 dark:text-white ml-2">Rp
+                                    {{ number_format($order->total_amount, 0, ',', '.') }}</span>
+                            </div>
+                            @if ($order->remaining_balance > 0)
+                                <div class="mt-1">
+                                    <span class="text-sm text-gray-600 dark:text-gray-400">Sisa Tagihan Belum
+                                        Dibayar:</span>
+                                    <span class="font-bold text-lg text-red-600 dark:text-red-400 ml-2">Rp
+                                        {{ number_format($order->remaining_balance, 0, ',', '.') }}</span>
+                                </div>
+                            @endif
+                        </div>
                     </div>
+
                 </div>
             @empty
                 <div

@@ -24,14 +24,14 @@ class ProductSeeder extends Seeder
                 'description' => 'Titanium. Begitu kuat. Begitu ringan. Begitu Pro. iPhone 15 Pro adalah iPhone pertama yang didesain dengan titanium sekelas industri dirgantara.',
                 'price' => 22500000,
                 'stock' => 50,
-                'image' => 'products/Iphone 16 Series.jpg'
+                'image' => 'products/iPhone 16 series.jpg'
             ],
             [
                 'name' => 'iPhone 14 Pro Max',
                 'description' => 'Layar Super Retina XDR 6,1 inci. Sistem kamera ganda canggih untuk foto yang lebih baik dalam pencahayaan apa pun.',
                 'price' => 11500000,
                 'stock' => 80,
-                'image' => 'products/iphone 14.jpg'
+                'image' => 'products/iphone 14 acessories.jpg'
             ],
             [
                 'name' => 'iPhone SE',
